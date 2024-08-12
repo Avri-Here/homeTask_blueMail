@@ -13,25 +13,24 @@ cells.forEach(cell => {
   });
 });
 
+
 resetButton.addEventListener('click', () => {
   socket.emit('resetGame');
 });
 
-socket.on('gameState', async ({ gameState }) => {
+
+socket.on('gameState', async ({ gameState, winner }) => {
+
   cells.forEach((cell, index) => {
     cell.textContent = gameState[index];
   });
 
-  const winner = checkWin(gameState);
-
   if (winner) {
-
     bodyHtml.style.display = 'none';
-    const displayMsg = winner === 'Draw' ? "No one won !" : `${winner} wins !`;
-
+    const displayMsg = winner === 'Draw' ? "No one won!" : `${winner} wins!`;
 
     await Swal.fire({
-      title: 'Game Is Over ..',
+      title: 'Game Over',
       text: displayMsg,
       icon: 'info',
       confirmButtonText: 'OK'
@@ -40,23 +39,5 @@ socket.on('gameState', async ({ gameState }) => {
     socket.emit('resetGame');
     bodyHtml.style.display = 'block';
   }
-
-
 });
 
-const checkWin = (board) => {
-  const winPatterns = [
-    [0, 1, 2], [3, 4, 5],
-    [6, 7, 8], [0, 3, 6],
-    [1, 4, 7], [2, 5, 8],
-    [0, 4, 8], [2, 4, 6],
-  ];
-
-  for (let pattern of winPatterns) {
-    const [a, b, c] = pattern;
-    if (board[a] && board[a] === board[b] && board[a] === board[c]) {
-      return board[a];
-    }
-  }
-  return board.includes(null) ? null : 'Draw';
-};
